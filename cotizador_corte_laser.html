@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaserQuote — Cotizador de Corte Láser</title>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#fff; --text:#17191d; --muted:#737780;
+  --line:#e7e8eb; --accent:#111; --accent2:#ff5a36;
+  --shadow:0 18px 50px rgba(20,25,35,.08);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.wrap{max-width:1180px;margin:auto;padding:34px 22px 60px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.5px}
+.logo{width:38px;height:38px;border-radius:12px;background:#111;color:white;display:grid;place-items:center;font-size:19px}
+.badge{font-size:12px;color:#666;background:#fff;border:1px solid var(--line);padding:8px 12px;border-radius:99px}
+.hero{margin-bottom:28px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:.98;margin:0 0 12px;letter-spacing:-2.5px}
+.hero p{margin:0;color:var(--muted);font-size:16px}
+.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+.form{padding:28px}
+.result{padding:28px;position:sticky;top:20px;height:max-content}
+.section-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#8a8d94;margin:0 0 18px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:25px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}
+input,select{
+ width:100%;height:50px;border:1px solid #dddfe3;border-radius:13px;
+ padding:0 14px;font-size:15px;background:#fff;outline:none;transition:.2s;
+}
+input:focus,select:focus{border-color:#111;box-shadow:0 0 0 3px rgba(0,0,0,.06)}
+.dimensions{display:grid;grid-template-columns:1fr 30px 1fr;align-items:end;gap:8px}
+.times{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.divider{height:1px;background:var(--line);margin:25px 0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:#f7f7f8;border-radius:14px;padding:14px}
+.stat small{display:block;color:#888;font-size:11px;margin-bottom:5px}
+.stat strong{font-size:15px}
+.price-label{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#888;font-weight:800;margin-top:24px}
+.price{font-size:42px;font-weight:850;letter-spacing:-2px;margin:5px 0 16px}
+.price span{font-size:14px;color:#888;letter-spacing:0}
+button{
+ width:100%;height:54px;border:0;border-radius:14px;background:#111;color:#fff;
+ font-size:14px;font-weight:800;cursor:pointer;transition:.2s;
+}
+button:hover{transform:translateY(-1px);background:#272727}
+.breakdown{border-top:1px solid var(--line);margin-top:22px;padding-top:18px}
+.row{display:flex;justify-content:space-between;gap:20px;padding:7px 0;color:#666;font-size:13px}
+.row strong{color:#222}
+.note{font-size:11px;color:#999;line-height:1.5;margin-top:16px}
+.material-preview{height:120px;border-radius:18px;margin-bottom:24px;background:
+ radial-gradient(circle at 25% 30%,rgba(255,255,255,.65),transparent 28%),
+ linear-gradient(135deg,#25272b,#111);
+ display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;
+ letter-spacing:1px;position:relative;overflow:hidden;
+}
+.material-preview:after{content:"";position:absolute;width:150px;height:150px;border:1px solid rgba(255,255,255,.18);transform:rotate(45deg)}
+.material-name{z-index:1}
+@media(max-width:850px){
+ .grid{grid-template-columns:1fr}.result{position:static}
+}
+@media(max-width:580px){
+ .fields,.times{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr 1fr}
+ .form,.result{padding:20px}.wrap{padding:24px 14px 40px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><div class="logo">✦</div> LASERQUOTE</div>
+    <div class="badge">Cotizador de fabricación</div>
+  </div>
+
+  <div class="hero">
+    <h1>Corta. Calcula.<br>Produce.</h1>
+    <p>Cotiza piezas de corte láser en segundos según material, espesor y dimensiones.</p>
+  </div>
+
+  <div class="grid">
+    <section class="card form">
+      <div class="section-title">01 · Material</div>
+      <div class="material-preview"><div class="material-name" id="previewName">ACRÍLICO</div></div>
+
+      <div class="fields">
+        <div class="field">
+          <label>Material</label>
+          <select id="material">
+            <option value="acrilico">Acrílico</option>
+            <option value="mdf">MDF</option>
+            <option value="acero">Acero</option>
+            <option value="aluminio">Aluminio</option>
+            <option value="carton">Cartón</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Espesor</label>
+          <select id="thickness"></select>
+        </div>
+      </div>
+
+      <div class="section-title">02 · Dimensiones</div>
+      <div class="fields">
+        <div class="field">
+          <label>Ancho <span style="color:#999">mm</span></label>
+          <input id="width" type="number" value="300" min="1">
+        </div>
+        <div class="field">
+          <label>Alto <span style="color:#999">mm</span></label>
+          <input id="height" type="number" value="200" min="1">
+        </div>
+        <div class="field">
+          <label>Metros de corte por pieza</label>
+          <input id="cutLength" type="number" value="2.4" min="0" step=".1">
+        </div>
+        <div class="field">
+          <label>Cantidad</label>
+          <input id="quantity" type="number" value="10" min="1">
+        </div>
+      </div>
+
+      <div class="section-title">03 · Producción</div>
+      <div class="times">
+        <div class="field">
+          <label>Tiempo de máquina / pieza <span style="color:#999">min</span></label>
+          <input id="machineTime" type="number" value="8" min="0" step=".5">
+        </div>
+        <div class="field">
+          <label>Margen de ganancia <span style="color:#999">%</span></label>
+          <input id="margin" type="number" value="30" min="0" step="1">
+        </div>
+      </div>
+    </section>
+
+    <aside class="card result">
+      <div class="section-title">Cotización estimada</div>
+      <div class="stats">
+        <div class="stat"><small>Área</small><strong id="area">0.060 m²</strong></div>
+        <div class="stat"><small>Corte total</small><strong id="cutTotal">24.0 m</strong></div>
+        <div class="stat"><small>Tiempo total</small><strong id="timeTotal">80 min</strong></div>
+      </div>
+
+      <div class="price-label">Precio total</div>
+      <div class="price" id="total">$ 0 <span>COP</span></div>
+      <button onclick="showQuote()">GENERAR COTIZACIÓN</button>
+
+      <div class="breakdown">
+        <div class="row"><span>Material</span><strong id="materialCost">$ 0</strong></div>
+        <div class="row"><span>Corte láser</span><strong id="cutCost">$ 0</strong></div>
+        <div class="row"><span>Preparación</span><strong id="setupCost">$ 0</strong></div>
+        <div class="row"><span>Margen</span><strong id="marginCost">$ 0</strong></div>
+      </div>
+      <div class="note">
+        * Valores demostrativos. Ajusta las tarifas de material, corte y preparación
+        a los costos reales de tu máquina y proveedor.
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const materials = {
+  acrilico:{name:"ACRÍLICO", density:1, price:{2:32000,3:42000,5:65000,6:76000,10:120000}, cut:1800},
+  mdf:{name:"MDF", density:1, price:{3:18000,5:24000,6:28000,9:39000,12:52000}, cut:1200},
+  acero:{name:"ACERO", density:1, price:{1:42000,1.5:52000,2:68000,3:92000,5:140000}, cut:4200},
+  aluminio:{name:"ALUMINIO", density:1, price:{1:65000,1.5:78000,2:95000,3:125000,5:180000}, cut:4800},
+  carton:{name:"CARTÓN", density:1, price:{1:9000,2:12000,3:16000}, cut:900}
+};
+
+const $ = id => document.getElementById(id);
+const money = n => "$ " + Math.round(n).toLocaleString("es-CO");
+
+function loadThickness(){
+  const m=materials[$("material").value];
+  $("thickness").innerHTML=Object.keys(m.price).map(x=>`<option value="${x}">${x} mm</option>`).join("");
+  $("previewName").textContent=m.name;
+  calculate();
+}
+
+function calculate(){
+  const m=materials[$("material").value];
+  const t=parseFloat($("thickness").value)||0;
+  const w=parseFloat($("width").value)||0;
+  const h=parseFloat($("height").value)||0;
+  const q=parseInt($("quantity").value)||0;
+  const cut=parseFloat($("cutLength").value)||0;
+  const time=parseFloat($("machineTime").value)||0;
+  const margin=parseFloat($("margin").value)||0;
+
+  const area=(w*h/1000000);
+  const materialRate=m.price[t] || 0;
+  const materialCost=area*q*materialRate;
+  const cutCost=cut*q*m.cut;
+  const setup=15000;
+  const subtotal=materialCost+cutCost+setup;
+  const marginValue=subtotal*(margin/100);
+  const total=subtotal+marginValue;
+
+  $("area").textContent=area.toFixed(3)+" m²";
+  $("cutTotal").textContent=(cut*q).toFixed(1)+" m";
+  $("timeTotal").textContent=Math.round(time*q)+" min";
+  $("materialCost").textContent=money(materialCost);
+  $("cutCost").textContent=money(cutCost);
+  $("setupCost").textContent=money(setup);
+  $("marginCost").textContent=money(marginValue);
+  $("total").innerHTML=money(total)+' <span>COP</span>';
+}
+
+function showQuote(){
+  const total=$("total").innerText;
+  alert("Cotización generada\n\nMaterial: "+materials[$("material").value].name+
+        "\nDimensiones: "+$("width").value+" × "+$("height").value+" mm"+
+        "\nCantidad: "+$("quantity").value+
+        "\n\nTOTAL: "+total);
+}
+
+$("material").addEventListener("change",loadThickness);
+["thickness","width","height","cutLength","quantity","machineTime","margin"]
+.forEach(id=>$(id).addEventListener("input",calculate));
+
+loadThickness();
+</script>
+</body>
+</html>
